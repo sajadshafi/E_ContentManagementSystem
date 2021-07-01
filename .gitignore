@@ -1,0 +1,15 @@
+################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/Wiser_WEB_API
+
+/Wiser.API.Controllers/bin
+/Wiser.API.Controllers/obj
+/Wiser.API.Domain/bin
+/Wiser.API.Domain/obj
+/Wiser_WEB_API/.config
+/Wiser_WEB_API/bin
+/Wiser_WEB_API/obj/Debug/netcoreapp3.1
+/Wiser_WEB_API/obj
+/Wiser_WEB_API/Properties/PublishProfiles
