@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Wiser.API.Entities.Migrations
 {
-    public partial class initial_clean : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -126,6 +126,7 @@ namespace Wiser.API.Entities.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CourseName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CourseCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -141,6 +142,12 @@ namespace Wiser.API.Entities.Migrations
                         principalTable: "CourseCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Courses_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -184,6 +191,7 @@ namespace Wiser.API.Entities.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SubjectName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SubjectCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SemesterNo = table.Column<int>(type: "int", nullable: false),
                     NumberOfSeats = table.Column<int>(type: "int", nullable: false),
                     SubjectCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -206,6 +214,35 @@ namespace Wiser.API.Entities.Migrations
                         name: "FK_Subjects_SubjectCategories_SubjectCategoryId",
                         column: x => x.SubjectCategoryId,
                         principalTable: "SubjectCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubjectAllotments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SemesterNo = table.Column<int>(type: "int", nullable: false),
+                    AcademicSession = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CoreSubjects = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GESubjects = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SkillSubjects = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubjectAllotments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubjectAllotments_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -296,6 +333,71 @@ namespace Wiser.API.Entities.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "EContents",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SubjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Unit = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EContents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EContents_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EContents_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EContents_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EFiles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EContentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EFiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EFiles_EContents_EContentId",
+                        column: x => x.EContentId,
+                        principalTable: "EContents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -346,6 +448,36 @@ namespace Wiser.API.Entities.Migrations
                 column: "CourseCategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Courses_CourseId",
+                table: "Courses",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EContents_CourseId",
+                table: "EContents",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EContents_SubjectId",
+                table: "EContents",
+                column: "SubjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EContents_UserId",
+                table: "EContents",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EFiles_EContentId",
+                table: "EFiles",
+                column: "EContentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubjectAllotments_CourseId",
+                table: "SubjectAllotments",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Subjects_DepartmentId",
                 table: "Subjects",
                 column: "DepartmentId");
@@ -374,28 +506,37 @@ namespace Wiser.API.Entities.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Courses");
+                name: "EFiles");
 
             migrationBuilder.DropTable(
                 name: "Institutes");
 
             migrationBuilder.DropTable(
-                name: "Subjects");
+                name: "SubjectAllotments");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "EContents");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Courses");
+
+            migrationBuilder.DropTable(
+                name: "Subjects");
 
             migrationBuilder.DropTable(
                 name: "CourseCategories");
 
             migrationBuilder.DropTable(
-                name: "SubjectCategories");
+                name: "Departments");
 
             migrationBuilder.DropTable(
-                name: "Departments");
+                name: "SubjectCategories");
         }
     }
 }

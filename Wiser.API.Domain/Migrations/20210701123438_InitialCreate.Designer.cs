@@ -10,8 +10,8 @@ using Wiser.API.Entities;
 namespace Wiser.API.Entities.Migrations
 {
     [DbContext(typeof(WiserContext))]
-    [Migration("20210514143037_add-semester-no-to-subjects")]
-    partial class addsemesternotosubjects
+    [Migration("20210701123438_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -119,6 +119,9 @@ namespace Wiser.API.Entities.Migrations
                     b.Property<Guid>("CourseCategoryId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("CourseName")
                         .HasColumnType("nvarchar(max)");
 
@@ -140,6 +143,8 @@ namespace Wiser.API.Entities.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CourseCategoryId");
+
+                    b.HasIndex("CourseId");
 
                     b.ToTable("Courses");
                 });
@@ -214,6 +219,9 @@ namespace Wiser.API.Entities.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -235,10 +243,15 @@ namespace Wiser.API.Entities.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Unit")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
 
                     b.HasIndex("SubjectId");
 
@@ -266,9 +279,6 @@ namespace Wiser.API.Entities.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("FilePath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FileTitle")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -631,11 +641,19 @@ namespace Wiser.API.Entities.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Wiser.API.Entities.Models.Course", null)
+                        .WithMany("Courses")
+                        .HasForeignKey("CourseId");
+
                     b.Navigation("CourseCategory");
                 });
 
             modelBuilder.Entity("Wiser.API.Entities.Models.EContent", b =>
                 {
+                    b.HasOne("Wiser.API.Entities.Models.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId");
+
                     b.HasOne("Wiser.API.Entities.Models.Subject", "Subject")
                         .WithMany("EContents")
                         .HasForeignKey("SubjectId")
@@ -645,6 +663,8 @@ namespace Wiser.API.Entities.Migrations
                     b.HasOne("Wiser.API.Entities.Models.SystemUser", "SystemUser")
                         .WithMany("EContents")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Course");
 
                     b.Navigation("Subject");
 
@@ -718,6 +738,8 @@ namespace Wiser.API.Entities.Migrations
 
             modelBuilder.Entity("Wiser.API.Entities.Models.Course", b =>
                 {
+                    b.Navigation("Courses");
+
                     b.Navigation("SubjectAllotments");
                 });
 
